@@ -13,7 +13,7 @@ from llama_index.core.node_parser import SentenceSplitter
 class TestEmbed(unittest.TestCase):
     def test_load_split(self):
         source_urls = [
-            "https://github.com/aws-samples/bedrock-claude-chat",
+            "https://github.com/UNCOMN-DS-CoP/uncomn-chat.git",
         ]
         loader = UrlLoader(source_urls)
         documents = loader.load()

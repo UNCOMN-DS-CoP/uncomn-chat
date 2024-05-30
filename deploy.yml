@@ -104,8 +104,8 @@ Resources:
               },
               "build": {
                 "commands": [
-                  "git clone https://github.com/aws-samples/bedrock-claude-chat.git",
-                  "cd bedrock-claude-chat/cdk",
+                  "git clone https://github.com/UNCOMN-DS-CoP/uncomn-chat.git",
+                  "cd uncomn-chat/cdk",
                   "npm ci",
                   "cdk bootstrap",
                   "cdk deploy --require-approval never --all"
