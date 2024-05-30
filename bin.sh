@@ -1,6 +1,6 @@
 #!/bin/bash
 
-StackName="CodeBuildForDeploy"
+StackName="UNCOMNCodeBuildForDeploy"
 
 stackId=$(aws cloudformation create-stack \
   --stack-name $StackName \
