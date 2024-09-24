@@ -30,17 +30,6 @@ Analyze usage for each user / bot on administrator dashboard. [detail](./docs/AD
 
 ![](./docs/imgs/admin_bot_analytics.png)
 
-## 📚 Supported Languages
-
-- English 💬
-- 日本語 💬 (ドキュメントは[こちら](./docs/README_ja.md))
-- 한국어 💬
-- 中文 💬
-- Français 💬
-- Deutsch 💬
-- Español 💬
-- Italian 💬
-
 ## 🚀 Super-easy Deployment
 
 - In the us-east-1 region, open [Bedrock Model access](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/modelaccess) > `Manage model access` > Check `Anthropic / Claude 3 Haiku`, `Anthropic / Claude 3 Sonnet` and `Cohere / Embed Multilingual` then `Save changes`.
