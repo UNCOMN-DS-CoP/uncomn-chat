@@ -32,6 +32,11 @@ const USER_POOL_DOMAIN_PREFIX: string = app.node.tryGetContext(
 );
 const RDS_SCHEDULES: CronScheduleProps = app.node.tryGetContext("rdbSchedules");
 const ENABLE_MISTRAL: boolean = app.node.tryGetContext("enableMistral");
+const SELF_SIGN_UP_ENABLED: boolean = app.node.tryGetContext("selfSignUpEnabled");
+
+// container size of embedding ecs tasks
+const EMBEDDING_CONTAINER_VCPU:number = app.node.tryGetContext("embeddingContainerVcpu")
+const EMBEDDING_CONTAINER_MEMORY:number = app.node.tryGetContext("embeddingContainerMemory")
 
 // WAF for frontend
 // 2023/9: Currently, the WAF for CloudFront needs to be created in the North America region (us-east-1), so the stacks are separated
@@ -63,5 +68,8 @@ const chat = new BedrockChatStack(app, `BedrockChatStack`, {
     ALLOWED_SIGN_UP_EMAIL_DOMAINS,
   rdsSchedules: RDS_SCHEDULES,
   enableMistral: ENABLE_MISTRAL,
+  embeddingContainerVcpu: EMBEDDING_CONTAINER_VCPU,
+  embeddingContainerMemory: EMBEDDING_CONTAINER_MEMORY,
+  selfSignUpEnabled: SELF_SIGN_UP_ENABLED,
 });
 chat.addDependency(waf);

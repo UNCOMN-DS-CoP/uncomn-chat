@@ -33,6 +33,9 @@ export interface BedrockChatStackProps extends StackProps {
   readonly allowedSignUpEmailDomains: string[];
   readonly rdsSchedules: CronScheduleProps;
   readonly enableMistral: boolean;
+  readonly embeddingContainerVcpu: number;
+  readonly embeddingContainerMemory: number;
+  readonly selfSignUpEnabled: boolean;
 }
 
 export class BedrockChatStack extends cdk.Stack {
@@ -102,6 +105,7 @@ export class BedrockChatStack extends cdk.Stack {
       userPoolDomainPrefixKey: props.userPoolDomainPrefix,
       idp,
       allowedSignUpEmailDomains: props.allowedSignUpEmailDomains,
+      selfSignUpEnabled: props.selfSignUpEnabled,
     });
     const largeMessageBucket = new Bucket(this, "LargeMessageBucket", {
       encryption: BucketEncryption.S3_MANAGED,
@@ -132,6 +136,7 @@ export class BedrockChatStack extends cdk.Stack {
       apiPublishProject: apiPublishCodebuild.project,
       usageAnalysis,
       largeMessageBucket,
+      enableMistral: props.enableMistral,
     });
     documentBucket.grantReadWrite(backendApi.handler);
 
@@ -169,6 +174,8 @@ export class BedrockChatStack extends cdk.Stack {
       dbConfig,
       tableAccessRole: database.tableAccessRole,
       documentBucket,
+      embeddingContainerVcpu: props.embeddingContainerVcpu,
+      embeddingContainerMemory: props.embeddingContainerMemory,
     });
     documentBucket.grantRead(embedding.container.taskDefinition.taskRole);
 

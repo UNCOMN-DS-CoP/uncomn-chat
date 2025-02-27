@@ -6,20 +6,20 @@ from datetime import datetime
 from decimal import Decimal as decimal
 
 import boto3
-from anthropic.types import ContentBlockDeltaEvent, MessageDeltaEvent, MessageStopEvent
+from anthropic.types import ContentBlockDeltaEvent
 from anthropic.types import Message as AnthropicMessage
+from anthropic.types import MessageDeltaEvent, MessageStopEvent
 from app.auth import verify_token
 from app.bedrock import calculate_price, compose_args
-from app.config import GENERATION_CONFIG, SEARCH_CONFIG
 from app.repositories.conversation import RecordNotFoundError, store_conversation
 from app.repositories.models.conversation import ChunkModel, ContentModel, MessageModel
 from app.routes.schemas.conversation import ChatInputWithToken
 from app.usecases.bot import modify_bot_last_used_time
 from app.usecases.chat import (
+    get_bedrock_response,
     insert_knowledge,
     prepare_conversation,
     trace_to_root,
-    get_bedrock_response,
 )
 from app.utils import get_anthropic_client, get_current_time, is_anthropic_model
 from app.vector_search import filter_used_results, search_related_docs
@@ -27,7 +27,6 @@ from boto3.dynamodb.conditions import Key
 from ulid import ULID
 
 WEBSOCKET_SESSION_TABLE_NAME = os.environ["WEBSOCKET_SESSION_TABLE_NAME"]
-
 
 client = get_anthropic_client()
 dynamodb_client = boto3.resource("dynamodb")
@@ -79,16 +78,19 @@ def process_chat_input(
                 )
             ).encode("utf-8"),
         )
+
         # Fetch most related documents from vector store
         # NOTE: Currently embedding not support multi-modal. For now, use the last text content.
         query = conversation.message_map[user_msg_id].content[-1].body
         search_results = search_related_docs(
-            bot_id=bot.id, limit=SEARCH_CONFIG["max_results"], query=query
+            bot_id=bot.id, limit=bot.search_params.max_results, query=query
         )
         logger.info(f"Search results from vector store: {search_results}")
 
         # Insert contexts to instruction
-        conversation_with_context = insert_knowledge(conversation, search_results)
+        conversation_with_context = insert_knowledge(
+            conversation, search_results, display_citation=bot.display_retrieved_chunks
+        )
         message_map = conversation_with_context.message_map
 
     messages = trace_to_root(
@@ -106,10 +108,22 @@ def process_chat_input(
             else None
         ),
         stream=True,
+        generation_params=(bot.generation_params if bot else None),
     )
 
     is_anthropic = is_anthropic_model(args["model"])
+
+    args_generation_config = {
+        "max_tokens": args["max_tokens"],
+        "top_k": args["top_k"],
+        "top_p": args["top_p"],
+        "temperature": args["temperature"],
+        "stop_sequences": args["stop_sequences"],
+    }
+
     # logger.debug(f"Invoking bedrock with args: {args}")
+    logger.info(f"Invoking bedrock with Generation Config: {args_generation_config}")
+
     try:
         if is_anthropic:
             response = client.messages.create(**args)
@@ -166,7 +180,7 @@ def process_chat_input(
 
                 # Used chunks for RAG generation
                 used_chunks = None
-                if bot:
+                if bot and bot.display_retrieved_chunks:
                     used_chunks = [
                         ChunkModel(content=r.content, source=r.source, rank=r.rank)
                         for r in filter_used_results(concatenated, search_results)
@@ -236,7 +250,7 @@ def process_chat_input(
 
                     concatenated = "".join(completions)
                     # Used chunks for RAG generation
-                    if bot:
+                    if bot and bot.display_retrieved_chunks:
                         used_chunks = [
                             ChunkModel(content=r.content, source=r.source, rank=r.rank)
                             for r in filter_used_results(concatenated, search_results)

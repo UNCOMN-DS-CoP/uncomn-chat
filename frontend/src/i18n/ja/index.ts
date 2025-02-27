@@ -50,6 +50,7 @@ const translation = {
           uploaded: 'アップロード完了',
           error: 'エラー',
         },
+        citeRetrievedContexts: '取得したコンテキストの引用',
       },
       titleSubmenu: {
         edit: 'ボットを編集',
@@ -68,6 +69,8 @@ const translation = {
           sitemap:
             'サイトマップのURLを指定すると、そのサイトマップ内のサイトを自動的にスクレイピングして得られた情報がナレッジとして利用されます。',
           file: 'アップロードしたファイルがナレッジとして利用されます。',
+          citeRetrievedContexts:
+            'ユーザーの質問に答えるために取得したコンテキストを引用情報として表示するかどうかを設定します。\n有効にすると、ユーザーは元のソースURLやファイルにアクセスできます。',
         },
       },
       alert: {
@@ -379,6 +382,10 @@ const translation = {
       chunkOverlap: {
         label: 'チャンクオーバーラップ',
         hint: '隣接するチャンク同士で重複する文字数を指定します。',
+      },
+      enablePartitionPdf: {
+        label: 'PDFの詳細解析の有効化。有効にすると時間をかけてPDFを詳細に分析します。',
+        hint: '検索精度を高めたい場合に有効です。計算により多くの時間がかかるため計算コストが増加します。',
       },
       help: {
         chunkSize:

@@ -6,7 +6,7 @@ from pprint import pprint
 
 from anthropic.types import MessageStopEvent
 from app.bedrock import get_model_id
-from app.config import GENERATION_CONFIG
+from app.config import DEFAULT_GENERATION_CONFIG
 from app.repositories.conversation import (
     delete_conversation_by_id,
     delete_conversation_by_user_id,
@@ -546,7 +546,6 @@ class TestChatWithCustomizedBot(unittest.TestCase):
     first_public_bot_id = "public1"
 
     def setUp(self) -> None:
-
         private_bot = create_test_private_bot(
             self.first_private_bot_id,
             True,
@@ -785,7 +784,9 @@ class TestInsertKnowledge(unittest.TestCase):
             bot_id="bot1",
             last_message_id="1-user",
         )
-        conversation_with_context = insert_knowledge(conversation, results)
+        conversation_with_context = insert_knowledge(
+            conversation, results, display_citation=True
+        )
         print(conversation_with_context.message_map["instruction"])
 
 
@@ -816,7 +817,7 @@ class TestStreamingApi(unittest.TestCase):
         )
         messages.append(chat_input.message)  # type: ignore
         args = {
-            **GENERATION_CONFIG,
+            **DEFAULT_GENERATION_CONFIG,
             "model": get_model_id(chat_input.message.model),
             "messages": [
                 {"role": message.role, "content": message.content[0].body}

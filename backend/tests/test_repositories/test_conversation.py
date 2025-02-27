@@ -27,6 +27,8 @@ from app.repositories.models.custom_bot import (
     BotModel,
     EmbeddingParamsModel,
     KnowledgeModel,
+    GenerationParamsModel,
+    SearchParamsModel,
 )
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
@@ -366,6 +368,17 @@ class TestConversationBotRepository(unittest.TestCase):
             embedding_params=EmbeddingParamsModel(
                 chunk_size=DEFAULT_EMBEDDING_CONFIG["chunk_size"],
                 chunk_overlap=DEFAULT_EMBEDDING_CONFIG["chunk_overlap"],
+                enable_partition_pdf=DEFAULT_EMBEDDING_CONFIG["enable_partition_pdf"],
+            ),
+            generation_params=GenerationParamsModel(
+                max_tokens=2000,
+                top_k=250,
+                top_p=0.999,
+                temperature=0.6,
+                stop_sequences=["Human: ", "Assistant: "],
+            ),
+            search_params=SearchParamsModel(
+                max_results=20,
             ),
             knowledge=KnowledgeModel(
                 source_urls=["https://aws.amazon.com/"],
@@ -378,6 +391,7 @@ class TestConversationBotRepository(unittest.TestCase):
             published_api_codebuild_id="",
             published_api_datetime=0,
             published_api_stack_name="",
+            display_retrieved_chunks=True,
         )
         bot2 = BotModel(
             id="2",
@@ -392,6 +406,17 @@ class TestConversationBotRepository(unittest.TestCase):
             embedding_params=EmbeddingParamsModel(
                 chunk_size=DEFAULT_EMBEDDING_CONFIG["chunk_size"],
                 chunk_overlap=DEFAULT_EMBEDDING_CONFIG["chunk_overlap"],
+                enable_partition_pdf=DEFAULT_EMBEDDING_CONFIG["enable_partition_pdf"],
+            ),
+            generation_params=GenerationParamsModel(
+                max_tokens=2000,
+                top_k=250,
+                top_p=0.999,
+                temperature=0.6,
+                stop_sequences=["Human: ", "Assistant: "],
+            ),
+            search_params=SearchParamsModel(
+                max_results=20,
             ),
             knowledge=KnowledgeModel(
                 source_urls=["https://aws.amazon.com/"],
@@ -404,6 +429,7 @@ class TestConversationBotRepository(unittest.TestCase):
             published_api_codebuild_id="",
             published_api_datetime=0,
             published_api_stack_name="",
+            display_retrieved_chunks=True,
         )
 
         store_conversation("user", conversation1)
